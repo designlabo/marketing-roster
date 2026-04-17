@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>グループ別受講者名簿 | マーケティングII 2026年度</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+  :root {
+    --dark: #1A1A2E;
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --teal: #2D6068;
+    --teal-light: #3D8090;
+    --cream: #F5F2EC;
+    --cream-dark: #EAE6DE;
+    --text-main: #1A1A2E;
+    --text-muted: #6B6B80;
+    --text-light: #9B9BAA;
+    --border: rgba(26,26,46,0.12);
+    --border-strong: rgba(26,26,46,0.22);
+    --shadow: 0 2px 12px rgba(26,26,46,0.07);
+    --shadow-hover: 0 6px 24px rgba(26,26,46,0.13);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--cream);
+    color: var(--text-main);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--dark);
+    padding: 2rem 2rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .header-left {}
+  .header-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .header-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .header-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-pill strong {
+    color: var(--gold-light);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .save-badge {
+    background: rgba(45,96,104,0.8);
+    border: 1px solid var(--teal-light);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #7ECCD8;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .save-badge.show { opacity: 1; }
+
+  /* ── Main ── */
+  main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    padding-left: 2px;
+  }
+
+  /* ── Group grid ── */
+  .group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── Group card ── */
+  .group-card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .group-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
+  }
+  .card-top {
+    background: var(--dark);
+    padding: 14px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .group-name-display {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    border-bottom: 1px dashed rgba(255,255,255,0.25);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: border-color 0.15s;
+  }
+  .group-name-display:hover { border-bottom-color: rgba(255,255,255,0.6); }
+  .group-name-input {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--gold);
+    outline: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    width: 100%;
+    flex: 1;
+  }
+  .count-badge {
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(201,168,76,0.25);
+    color: var(--gold-light);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 100px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+  }
+  .card-body {
+    padding: 14px 16px;
+  }
+  .member-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .member-row:hover { background: var(--cream); }
+  .member-name {
+    font-size: 13px;
+    color: var(--text-main);
+    flex: 1;
+  }
+  .move-select {
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 4px;
+    background: var(--cream);
+    color: var(--text-muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    max-width: 90px;
+    display: none;
+    cursor: pointer;
+  }
+  .member-row:hover .move-select { display: block; }
+  .btn-x {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .btn-x:hover { background: #FEE; color: #C0392B; border-color: #F5B8B8; }
+  .add-row {
+    display: flex;
+    gap: 6px;
+  }
+  .add-input {
+    font-size: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    background: var(--cream);
+    color: var(--text-main);
+    font-family: 'Noto Sans JP', sans-serif;
+    flex: 1;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--teal); }
+  .btn-add {
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--dark);
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn-add:hover { background: var(--teal); border-color: var(--teal); }
+
+  /* ── Solo section ── */
+  .solo-section {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 1.5rem;
+  }
+  .solo-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .solo-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 5px 12px;
+    color: var(--text-main);
+  }
+
+  /* ── Add group row ── */
+  .add-group-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 3rem;
+  }
+  .add-group-input {
+    font-size: 13px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    background: #fff;
+    color: var(--text-main);
+    font-family: 'Noto Sans JP', sans-serif;
+    flex: 1;
+    outline: none;
+    transition: border-color 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .add-group-input:focus { border-color: var(--teal); }
+  .btn-add-group {
+    font-size: 13px;
+    padding: 8px 20px;
+    border: 1px solid var(--gold);
+    border-radius: var(--radius-sm);
+    background: var(--dark);
+    color: var(--gold-light);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    transition: background 0.15s;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+  .btn-add-group:hover { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--dark);
+    padding: 1.2rem 2rem;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+    border-top: 1px solid rgba(201,168,76,0.25);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 500px) {
+    header { padding: 1.2rem; }
+    .header-title { font-size: 18px; }
+    main { padding: 1.2rem 1rem; }
+    .group-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-eyebrow">Marketing II 2026</div>
+      <div class="header-title">グループ別受講者名簿</div>
+      <div class="header-meta">氏名をダブルクリックで編集 ／ 変更は自動保存されます</div>
+    </div>
+    <div class="header-right">
+      <div class="stat-pill">グループ <strong id="groupCount">0</strong></div>
+      <div class="stat-pill">受講者 <strong id="totalCount">0</strong> 名</div>
+      <div class="save-badge" id="saveBadge">保存しました</div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="section-label">グループ一覧</div>
+  <div class="group-grid" id="groupGrid"></div>
+
+  <div class="section-label">個人受講</div>
+  <div class="solo-section">
+    <div class="solo-chips" id="soloChips"></div>
+    <div class="add-row">
+      <input class="add-input" id="soloInput" placeholder="氏名を追加（さん 不要）" onkeydown="if(event.key==='Enter')addSolo()">
+      <button class="btn-add" onclick="addSolo()">追加</button>
+    </div>
+  </div>
+
+  <div class="add-group-row">
+    <input class="add-group-input" id="newGroupName" placeholder="新しいグループ名を入力" onkeydown="if(event.key==='Enter')addGroup()">
+    <button class="btn-add-group" onclick="addGroup()">＋ グループを追加</button>
+  </div>
+</main>
+
+<footer>
+  マーケティングII 2026年度 ｜ 岩崎学園 ｜ DESIGN LAB Co., Ltd. &nbsp;—&nbsp; データはこのブラウザに保存されます
+</footer>
+
+<script>
+const STORAGE_KEY = 'marketingII-roster-2026';
+
+const DEFAULT = {
+  groups: [
+    {id:'g1', name:'まーらーたん',   members:['うえき','ささき']},
+    {id:'g2', name:'ベイビー',       members:['いのい','やまぐち','おおいし']},
+    {id:'g3', name:'タピオカ',       members:['小笠原','大野']},
+    {id:'g4', name:'たこぴー',       members:['吉村','西久保','小川','綿引']},
+    {id:'g5', name:'ポップコーン',   members:['大川','けいな','ももえ']},
+    {id:'g6', name:'ノンノン',       members:['あい','ちなつ','かのん']},
+    {id:'g7', name:'（グループ名未設定）', members:['岩井','相良']}
+  ],
+  solo: ['藤田','森田','田中','よしざわ']
+};
+
+let state = loadState();
+let saveTimer = null;
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    return s ? JSON.parse(s) : JSON.parse(JSON.stringify(DEFAULT));
+  } catch(e) {
+    return JSON.parse(JSON.stringify(DEFAULT));
+  }
+}
+
+function persist() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    const b = document.getElementById('saveBadge');
+    b.classList.add('show');
+    setTimeout(() => b.classList.remove('show'), 2000);
+  }, 500);
+}
+
+function totalMembers() {
+  return state.groups.reduce((n, g) => n + g.members.length, 0) + state.solo.length;
+}
+
+function groupOptions(excludeId) {
+  return state.groups
+    .filter(g => g.id !== excludeId)
+    .map(g => `<option value="${g.id}">${g.name}</option>`)
+    .join('');
+}
+
+function render() {
+  document.getElementById('groupCount').textContent = state.groups.length;
+  document.getElementById('totalCount').textContent = totalMembers();
+
+  const grid = document.getElementById('groupGrid');
+  grid.innerHTML = state.groups.map(g => `
+    <div class="group-card">
+      <div class="card-top">
+        <div class="group-name-display" ondblclick="editName('${g.id}')" title="ダブルクリックで編集">${esc(g.name)}</div>
+        <span class="count-badge">${g.members.length}名</span>
+      </div>
+      <div class="card-body" id="body-${g.id}">
+        <div class="member-list">
+          ${g.members.map((m, i) => `
+            <div class="member-row">
+              <span class="member-name">${esc(m)} さん</span>
+              <select class="move-select" onchange="moveMember('${g.id}',${i},this.value)" title="グループを移動">
+                <option value="">移動先...</option>
+                ${groupOptions(g.id)}
+              </select>
+              <button class="btn-x" onclick="removeMember('${g.id}',${i})" title="削除">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <div class="add-row">
+          <input class="add-input" id="ai-${g.id}" placeholder="メンバーを追加" onkeydown="if(event.key==='Enter')addMember('${g.id}')">
+          <button class="btn-add" onclick="addMember('${g.id}')">追加</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('soloChips').innerHTML = state.solo.map((m, i) => `
+    <div class="solo-chip">
+      ${esc(m)} さん
+      <button class="btn-x" onclick="removeSolo(${i})" title="削除">×</button>
+    </div>
+  `).join('');
+}
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function editName(id) {
+  const g = state.groups.find(x => x.id === id);
+  const top = document.querySelector(`#body-${id}`).previousElementSibling;
+  const disp = top.querySelector('.group-name-display');
+  const inp = document.createElement('input');
+  inp.className = 'group-name-input';
+  inp.value = g.name;
+  top.replaceChild(inp, disp);
+  inp.focus(); inp.select();
+  function commit() {
+    g.name = inp.value.trim() || g.name;
+    persist(); render();
+  }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') inp.blur();
+    if (e.key === 'Escape') { inp.value = g.name; inp.blur(); }
+  });
+}
+
+function addMember(id) {
+  const inp = document.getElementById('ai-' + id);
+  const v = inp.value.trim();
+  if (!v) return;
+  state.groups.find(g => g.id === id).members.push(v);
+  persist(); render();
+}
+
+function removeMember(id, idx) {
+  state.groups.find(g => g.id === id).members.splice(idx, 1);
+  persist(); render();
+}
+
+function moveMember(fromId, idx, toId) {
+  if (!toId) return;
+  const from = state.groups.find(g => g.id === fromId);
+  const to   = state.groups.find(g => g.id === toId);
+  const [m]  = from.members.splice(idx, 1);
+  to.members.push(m);
+  persist(); render();
+}
+
+function addSolo() {
+  const inp = document.getElementById('soloInput');
+  const v = inp.value.trim();
+  if (!v) return;
+  state.solo.push(v);
+  inp.value = '';
+  persist(); render();
+}
+
+function removeSolo(idx) {
+  state.solo.splice(idx, 1);
+  persist(); render();
+}
+
+function addGroup() {
+  const inp = document.getElementById('newGroupName');
+  const v = inp.value.trim();
+  if (!v) return;
+  state.groups.push({ id: 'g' + Date.now(), name: v, members: [] });
+  inp.value = '';
+  persist(); render();
+}
+
+render();
+</script>
+</body>
+</html>
